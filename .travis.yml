@@ -1,0 +1,17 @@
+sudo: required
+language: csharp
+mono: none
+dotnet: 2.1
+
+branches:
+  except:
+    # this is required to avoid building tags.
+    - /^v?\d+\.\d+\.\d+(\w*\W*)*$/
+script:
+  - sed -i -e "s/000/${TRAVIS_BUILD_NUMBER^^}/g" $TRAVIS_BUILD_DIR/templates/templates.csproj
+  - dotnet build $TRAVIS_BUILD_DIR/templates/templates.csproj -c release -o $TRAVIS_BUILD_DIR/build/templates
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: dotnet nuget push $TRAVIS_BUILD_DIR/build/templates/NachoColl.Cloudformation4dotNET.Templates.DotNetNew.*.nupkg --api-key $NUGET_APIKEY --source https://www.nuget.org 
+    on: master 
