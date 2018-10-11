@@ -8,6 +8,7 @@ branches:
     # this is required to avoid building tags.
     - /^v?\d+\.\d+\.\d+(\w*\W*)*$/
 script:
+  - dotnet test $TRAVIS_BUILD_DIR/templates/api-template/test
   - sed -i -e "s/000/${TRAVIS_BUILD_NUMBER^^}/g" $TRAVIS_BUILD_DIR/templates/templates.csproj
   - dotnet build $TRAVIS_BUILD_DIR/templates/templates.csproj -c release -o $TRAVIS_BUILD_DIR/build/templates
 deploy:
