@@ -23,11 +23,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Content Include="api-template-travis/**/*.*" />
 		<Content Include="api-template/**/*.*" />
 	</ItemGroup>
 
 	<!-- Ignore source code in the content folder; it's part of the template(s) -->
 	<ItemGroup>
+		<Compile Remove="api-template-travis/**/*.cs" />
 		<Compile Remove="api-template/**/*.cs" />
 	</ItemGroup>
 </Project>

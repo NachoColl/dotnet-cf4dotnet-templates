@@ -1,0 +1,33 @@
+sudo: required
+language: csharp
+mono: none
+dotnet: 2.1
+
+branches:
+  except:
+    # this is required to avoid building tags.
+    - /^v?\d+\.\d+\.\d+(\w*\W*)*$/
+    # dev brach should not be published on the cloud.
+    - dev
+install:
+  # install awscli for deploying
+  - pip install awscli --upgrade --user
+  # intall newman for testing
+  - npm install -g newman
+  - npm install -g newman-reporter-html
+script:
+  # unit testing
+  - dotnet test $TRAVIS_BUILD_DIR/test
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: bash $TRAVIS_BUILD_DIR/deploy/.deploy.sh test 
+    on: test
+  - provider: script
+    skip_cleanup: true
+    script: bash $TRAVIS_BUILD_DIR/deploy/.deploy.sh staging 
+    on: staging
+  - provider: script
+    skip_cleanup: true
+    script: bash $TRAVIS_BUILD_DIR/deploy/.deploy.sh prod 
+    on: master
