@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-        <Title>Cloudformation4dotNET templates for "dotnet new"</Title>
-		<Description>Cloudformation4dotNET templates for "dotnet new" that create new templates.</Description>
+        <Title>Cloudformation4dotNET (cf4dotnet) Templates</Title>
+		<Description>dotnet templates to use with Cloudformation4dotNET (cf4dotnet) tool.</Description>
         <Authors>Nacho Coll</Authors>
 		<PackageType>Template</PackageType>
 		<PackageId>NachoColl.Cloudformation4dotNET.Templates.DotNetNew</PackageId>

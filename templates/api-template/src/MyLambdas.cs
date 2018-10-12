@@ -12,7 +12,7 @@ namespace MyAPI {
     {
         
         /* A function that will get Lambda resources created (only) */
-        [Cloudformation4dotNET.Lambda.LambdaResourceProperties(TimeoutInSeconds=20)]
+        [Cloudformation4dotNET.Lambda.LambdaResourceProperties(TimeoutInSeconds=2)]
         public void Echo(string Input, ILambdaContext Context) => Context?.Logger?.Log(Input.ToUpper());
     }
 }
