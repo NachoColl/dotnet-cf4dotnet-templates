@@ -1,7 +1,17 @@
 #!/bin/bash
 
-set -e
+#############################################################################
+# Expected ENVIRONMENT VARIABLES on TRAVIS:                                 #    
+#   AWS_ACCOUNT_test                                                        #
+#   AWS_ACCOUNT_staging                                                     #
+#   AWS_ACCOUNT_prod                                                        #
+#   AWS_ACCESS_KEY_ID                                                       #
+#   AWS_SECRET_ACCESS_KEY                                                   #
+#   AWS_DEPLOY_ROLE (use the same name for all the accounts)                #
+#   AWS_DEFAULT_REGION                                                      #
+#############################################################################
 
+set -e
 
 #################
 # ARGUMENTS     #
@@ -9,61 +19,18 @@ set -e
 
 # test, staging or prod
 ENVIRONMENT=$1
+# project file name (e.g. MyProject)
+CSPROJ_FILENAME=$2
+# test project file name (e.g. MyTests)
+CSPROJ_TEST_FILENAME=$3
 
-# the project file name (e.g. MyApiProject)
-CSPROJ=$2
+######################################
+# STEP 1: SET AWS Credentials        #
+######################################
 
-# the test project file name (e.g. MyApiProjectTests)
-CSPROJ_TEST=$3
-
-#################
-# VARS          #
-#################
-
-# csproj files
-PROJECT_FILE=$(echo $TRAVIS_BUILD_DIR/src/$CSPROJ.csproj)
-PROJECT_FILE_TEST=$(echo $TRAVIS_BUILD_DIR/test/nwayapi.Tests.csproj)
-
-# testing
-TEST_PROJECT_FILE=$(echo $TRAVIS_BUILD_DIR/test/nwayapi.Tests.csproj)
-TEST_POSTMAN_PATH=$(echo $TRAVIS_BUILD_DIR/test/postman)
-TEST_POSTMAN_FULLPATH=$(echo $TEST_POSTMAN_PATH/nway-api.postman_collection.json)
-TEST_POSTMAN_ENVIRONMENT_FULLPATH=$(echo $TEST_POSTMAN_PATH/nway_${ENVIRONMENT}_environment.postman_environment.json)
-TEST_POSTMAN_RESULT_FULLPATH=$(echo $TEST_POSTMAN_PATH/result-$TRAVIS_BUILD_NUMBER.html)
-TEST_POSTMAN_S3_RESULT_FILENAME=$(echo result-$TRAVIS_BUILD_NUMBER.html)
-TEST_POSTMAN_S3_PRESIGNED_URI_FULLPATH=$(echo $TEST_POSTMAN_PATH/result-uri.txt)
-# artifact
-ARTIFACT_PATH=$(echo $TRAVIS_BUILD_DIR/dist/)
-ARTIFACT_BASEFILENAME=$(echo $ENVIRONMENT)
-ARTIFACT_FILENAME=$(echo $ENVIRONMENT-$TRAVIS_BUILD_NUMBER.zip)
-ARTIFACT_FULLPATH=$(echo $TRAVIS_BUILD_DIR/dist/$ARTIFACT_FILENAME)
-# cloudformation injection project
-INJECTION_DLL_FILE=$(echo $ARTIFACT_PATH/nwayapi.dll)
-INJECTION_FILESPATH=$(echo $TRAVIS_BUILD_DIR/deploy)
-INJECTION_PROJECT_FILE=$(echo $TRAVIS_BUILD_DIR/deploy/injection.csproj)
-# AWS related:
 AWS_ACCOUNT=$(case $ENVIRONMENT in test) echo $AWS_ACCOUNT_test ;; staging) echo $AWS_ACCOUNT_staging ;; prod) echo $AWS_ACCOUNT_prod ;; esac)
-AWS_ROLE=$(echo arn:aws:iam::$AWS_ACCOUNT:role/serverless-deployments)
-# local cloudformation templates
-CF_DATABASE_TEMPLATE=$(echo $TRAVIS_BUILD_DIR/deploy/dynamodb.yml)
-CF_BASE_TEMPLATE=$(echo $TRAVIS_BUILD_DIR/deploy/sam-base.yml)
-CF_INJECTED_TEMPLATE=$(echo $TRAVIS_BUILD_DIR/deploy/sam-$ENVIRONMENT.yml)
-# S3 artifacts
-S3_BUCKET=$(echo deployments-$AWS_ACCOUNT)
-S3_ARTIFACT_BUCKET=$(echo s3://$S3_BUCKET/api)
-S3_ARTIFACT_URI=$(echo $S3_ARTIFACT_BUCKET/$ARTIFACT_FILENAME)
-S3_POSTMAN_RESULT_URI=$(echo s3://$S3_BUCKET/api/$TEST_POSTMAN_S3_RESULT_FILENAME)
-# SNS
-SNS_RESULTS_TOPIC=$(echo arn:aws:sns:us-east-1:$AWS_ACCOUNT:nway-deployments)
-# AWS cloudformation STACKS
-CF_DATABASE_STACKNAME=$(echo nway-api-dynamodb)
-CF_BASE_STACKNAME=$(echo nway-api)
-CF_INJECTED_STACKNAME=$(echo nway-api-$ENVIRONMENT)
+AWS_ROLE=$(echo arn:aws:iam::$AWS_ACCOUNT:role/$AWS_DEPLOY_ROLE)
 
-
-###############################################
-# scripting
-###############################################
 echo "deploying to $AWS_ACCOUNT account using $AWS_ROLE role"
 # create AWS .config credentials file 
 echo "setting credentials"
@@ -73,33 +40,63 @@ aws configure set default.region $AWS_DEFAULT_REGION
 aws configure set profile.deploy.role_arn $AWS_ROLE
 aws configure set profile.deploy.source_profile default
 
-##############################################
-# create artifact and send to S3
-##############################################
+######################################
+# STEP 2: BUILD ARTIFACTS           #
+######################################
+
+# csproj files
+PROJECT_FILE=$(echo $TRAVIS_BUILD_DIR/src/$CSPROJ_FILENAME.csproj)
+PROJECT_FILE_TEST=$(echo $TRAVIS_BUILD_DIR/test/$CSPROJ_TEST_FILENAME.csproj)
+
+# artifacts local output location
+ARTIFACT_PATH=$(echo $TRAVIS_BUILD_DIR/artifacts/)
+ARTIFACT_FILENAME=$(echo $ENVIRONMENT-$TRAVIS_BUILD_NUMBER.zip)
+ARTIFACT_FULLPATH=$(echo $TRAVIS_BUILD_DIR/artifacts/$ARTIFACT_FILENAME)
 
 echo "creating artifact"
 # define code constants
 sed -i -e "s/RELEASE/${ENVIRONMENT^^}/g" $PROJECT_FILE
-sed -i -e "s/RELEASE/${ENVIRONMENT^^}/g" $LIBRARY_PROJECT_FILE
 # publish dotnet code
-dotnet publish $PROJECT_FILE -o $ARTIFACT_PATH --framework netcoreapp2.0 --runtime linux-x64 -c Release
+dotnet publish $PROJECT_FILE -o $ARTIFACT_PATH --framework netcoreapp2.1 --runtime linux-x64 -c Release
 # package code
 echo "packaging artifact"
 zip -j $ARTIFACT_FULLPATH $ARTIFACT_PATH/* 
+
+######################################
+# STEP 2: SEND ARTIFACTS TO S3       #
+######################################
+
+# artifact location on AWS S3
+S3_BUCKET=$(echo deployments-$AWS_ACCOUNT)
+S3_ARTIFACT_BUCKET=$(echo s3://$S3_BUCKET/api)
+S3_ARTIFACT_URI=$(echo $S3_ARTIFACT_BUCKET/$ARTIFACT_FILENAME)
+
 # upload code to S3 deployment bucket
 echo "copying artifact to s3"
 aws s3 --profile deploy cp $ARTIFACT_FULLPATH $S3_ARTIFACT_URI
 
+#############################################
+# STEP 3: BUILD cloudformation templates    #
+#############################################
 
-##############################################
-# deploy CF dynamodb template
-##############################################
 
-# just deploy DynamoDB on test environment. PROD account (staging + prod) already has a legacy version.
-if [ "$ENVIRONMENT" == "test" ]; then
-    echo "deploying dynamodb CF"
-    aws cloudformation deploy --profile deploy --template-file $CF_DATABASE_TEMPLATE --stack-name $CF_DATABASE_STACKNAME --tags appcode=nway --no-fail-on-empty-changeset 
-fi
+# cloudformation injection project
+INJECTION_DLL_FILE=$(echo $ARTIFACT_PATH/nwayapi.dll)
+INJECTION_FILESPATH=$(echo $TRAVIS_BUILD_DIR/deploy)
+INJECTION_PROJECT_FILE=$(echo $TRAVIS_BUILD_DIR/deploy/injection.csproj)
+
+# local cloudformation templates
+CF_DATABASE_TEMPLATE=$(echo $TRAVIS_BUILD_DIR/deploy/dynamodb.yml)
+CF_BASE_TEMPLATE=$(echo $TRAVIS_BUILD_DIR/sam-base.yml)
+CF_INJECTED_TEMPLATE=$(echo $TRAVIS_BUILD_DIR/deploy/sam-$ENVIRONMENT.yml)
+
+# SNS
+SNS_RESULTS_TOPIC=$(echo arn:aws:sns:us-east-1:$AWS_ACCOUNT:nway-deployments)
+# AWS cloudformation STACKS
+CF_DATABASE_STACKNAME=$(echo nway-api-dynamodb)
+CF_BASE_STACKNAME=$(echo nway-api)
+CF_INJECTED_STACKNAME=$(echo nway-api-$ENVIRONMENT)
+
 
 ##############################################
 # dynamically create CF API templates

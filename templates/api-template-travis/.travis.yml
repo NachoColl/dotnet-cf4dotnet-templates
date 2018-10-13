@@ -21,13 +21,13 @@ script:
 deploy:
   - provider: script
     skip_cleanup: true
-    script: bash $TRAVIS_BUILD_DIR/deploy/.deploy.sh test 
+    script: bash $TRAVIS_BUILD_DIR/.deploy.sh test MyProject MyTests
     on: test
   - provider: script
     skip_cleanup: true
-    script: bash $TRAVIS_BUILD_DIR/deploy/.deploy.sh staging 
+    script: bash $TRAVIS_BUILD_DIR/.deploy.sh staging MyProject MyTests
     on: staging
   - provider: script
     skip_cleanup: true
-    script: bash $TRAVIS_BUILD_DIR/deploy/.deploy.sh prod 
+    script: bash $TRAVIS_BUILD_DIR/.deploy.sh prod MyProject MyTests
     on: master

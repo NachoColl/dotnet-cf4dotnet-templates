@@ -4,8 +4,8 @@
 		<Description>dotnet templates to use with Cloudformation4dotNET (cf4dotnet) tool.</Description>
         <Authors>Nacho Coll</Authors>
 		<PackageType>Template</PackageType>
-		<PackageId>NachoColl.Cloudformation4dotNET.Templates</PackageId>
-        <PackageVersion>1.0.000</PackageVersion>		
+		<PackageId>NachoColl.Cloudformation4dotNET.Templates.DotNetNew.Tests</PackageId>
+        <PackageVersion>1.0.002</PackageVersion>		
 		<Tags>dotnet-new;templates</Tags>
 		<ContentTargetFolders>content</ContentTargetFolders>
 		<IncludeContentInPack>true</IncludeContentInPack>
@@ -23,13 +23,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Content Include="api-template-travis/**/*.*" />
+
 		<Content Include="api-template/**/*.*" />
 	</ItemGroup>
 
 	<!-- Ignore source code in the content folder; it's part of the template(s) -->
 	<ItemGroup>
-		<Compile Remove="api-template-travis/**/*.cs" />
 		<Compile Remove="api-template/**/*.cs" />
 	</ItemGroup>
 </Project>

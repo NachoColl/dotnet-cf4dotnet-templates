@@ -5,7 +5,7 @@
         "language": "C#"   
     },
     "classifications": [ "AWS", "Cloudformation", "C#" ],
-    "identity": "NachoColl.Cloudformation4dotNET.CSharp.Travis",
+    "identity": "NachoColl.Cloudformation4dotNET.Templates.cf4dotnet-travis",
     "name": "AWS API Gateway and Lambda demo project to use with Cloudformation4dotNET and Travis.",
     "shortName": "cf4dotnet-travis",
     "preferNameDirectory" : false,
