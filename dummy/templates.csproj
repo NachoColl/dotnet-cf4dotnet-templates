@@ -5,7 +5,7 @@
         <Authors>Nacho Coll</Authors>
 		<PackageType>Template</PackageType>
 		<PackageId>NachoColl.Cloudformation4dotNET.Templates.DotNetNew.Tests</PackageId>
-        <PackageVersion>1.0.002</PackageVersion>		
+        <PackageVersion>1.0.003</PackageVersion>		
 		<Tags>dotnet-new;templates</Tags>
 		<ContentTargetFolders>content</ContentTargetFolders>
 		<IncludeContentInPack>true</IncludeContentInPack>
