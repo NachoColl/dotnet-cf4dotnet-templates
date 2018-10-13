@@ -5,7 +5,7 @@ Some demo templates to build AWS Api Gateway and Lambdas dotNET core projects th
 ## How to Install
 
 ```
-dotnet new -i NachoColl.Cloudformation4dotNET.Templates.DotNetNew
+dotnet new -i NachoColl.Cloudformation4dotNET.Templates
 ```
 
 To create a new ```cf4dotnet```project, just type:
