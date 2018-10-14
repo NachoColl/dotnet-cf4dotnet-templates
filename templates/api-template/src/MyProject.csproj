@@ -26,7 +26,9 @@
   <ItemGroup>
     <!-- to install lambda tools (3.x.x) use 'dotnet tool install -g Amazon.Lambda.Tools' -->
     <!-- <DotNetCliToolReference Include="Amazon.Lambda.Tools" Version="*" /> -->
-    <DotNetCliToolReference Include="NachoColl.Cloudformation4dotNET" Version="0.0.*" />
+    
+    <!-- to install Cloudformation4dotNET (>=0.0.26) use 'dotnet tool install -g NachoColl.Cloudformation4dotNET' -->
+    <!--<DotNetCliToolReference Include="NachoColl.Cloudformation4dotNET" Version="0.0.*" />-->
   </ItemGroup>
 
 </Project>

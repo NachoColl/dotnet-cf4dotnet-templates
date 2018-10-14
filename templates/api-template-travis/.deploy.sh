@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #############################################################################
-# Expected ENVIRONMENT VARIABLES on TRAVIS:                                 #    
+# The ENVIRONMENT VARIABLES you must set on TRAVIS:                         #    
 #   AWS_ACCOUNT_test                                                        #
 #   AWS_ACCOUNT_staging                                                     #
 #   AWS_ACCOUNT_prod                                                        #
