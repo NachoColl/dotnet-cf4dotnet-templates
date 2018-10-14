@@ -32,4 +32,6 @@
 		<Compile Remove="api-template-travis/**/*.cs" />
 		<Compile Remove="api-template/**/*.cs" />
 	</ItemGroup>
+
+
 </Project>

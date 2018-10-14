@@ -19,10 +19,6 @@ set -e
 
 # test, staging or prod
 ENVIRONMENT=$1
-# project file name (e.g. MyProject)
-CSPROJ_FILENAME=$2
-# test project file name (e.g. MyTests)
-CSPROJ_TEST_FILENAME=$3
 
 ######################################
 # STEP 1: SET AWS Credentials        #
@@ -41,12 +37,11 @@ aws configure set profile.deploy.role_arn $AWS_ROLE
 aws configure set profile.deploy.source_profile default
 
 ######################################
-# STEP 2: BUILD ARTIFACTS           #
+# STEP 2: BUILD ARTIFACTS            #
 ######################################
 
 # csproj files
 PROJECT_FILE=$(echo $TRAVIS_BUILD_DIR/src/$CSPROJ_FILENAME.csproj)
-PROJECT_FILE_TEST=$(echo $TRAVIS_BUILD_DIR/test/$CSPROJ_TEST_FILENAME.csproj)
 
 # artifacts local output location
 ARTIFACT_PATH=$(echo $TRAVIS_BUILD_DIR/artifacts/)
@@ -57,7 +52,7 @@ echo "creating artifact"
 # define code constants
 sed -i -e "s/RELEASE/${ENVIRONMENT^^}/g" $PROJECT_FILE
 # publish dotnet code
-dotnet publish $PROJECT_FILE -o $ARTIFACT_PATH --framework netcoreapp2.1 --runtime linux-x64 -c Release
+dotnet publish $TRAVIS_BUILD_DIR/src -o $ARTIFACT_PATH --framework netcoreapp2.1 --runtime linux-x64 -c Release
 # package code
 echo "packaging artifact"
 zip -j $ARTIFACT_FULLPATH $ARTIFACT_PATH/* 
