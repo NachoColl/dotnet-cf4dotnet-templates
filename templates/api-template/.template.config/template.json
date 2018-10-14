@@ -9,5 +9,17 @@
     "name": "AWS API Gateway and Lambda demo project to use with Cloudformation4dotNET (cf4dotnet).",
     "shortName": "cf4dotnet",
     "preferNameDirectory" : false,
-    "sourceName": "MyAPI"
+    "sourceName": "MyAPI",
+    "symbols":{
+        "assemblyName": {
+            "type": "parameter",
+            "defaultValue": "MyProjectAssemblyName",
+            "replaces":"MyProjectAssemblyName"
+        },
+        "tagCode": {
+            "type": "parameter",
+            "defaultValue": "MyProjectTagCode",
+            "replaces":"MyProjectTagCode"
+        }
+    }
 }

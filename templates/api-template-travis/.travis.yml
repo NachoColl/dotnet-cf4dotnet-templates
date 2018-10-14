@@ -21,15 +21,16 @@ script:
   # unit testing
   - dotnet test $TRAVIS_BUILD_DIR/test
 deploy:
+  # .deploy.sh <environment> <csproj-file-name> <assembly-file-name> <project-tag-code>
   - provider: script
     skip_cleanup: true
-    script: bash $TRAVIS_BUILD_DIR/.deploy.sh test MyProject 
+    script: bash $TRAVIS_BUILD_DIR/.deploy.sh test MyProject MyProjectAssemblyName MyProjectTagCode
     on: test
   - provider: script
     skip_cleanup: true
-    script: bash $TRAVIS_BUILD_DIR/.deploy.sh staging MyProject 
+    script: bash $TRAVIS_BUILD_DIR/.deploy.sh staging MyProject MyProjectAssemblyName MyProjectTagCode
     on: staging
   - provider: script
     skip_cleanup: true
-    script: bash $TRAVIS_BUILD_DIR/.deploy.sh prod MyProject 
+    script: bash $TRAVIS_BUILD_DIR/.deploy.sh prod MyProject MyProjectAssemblyName MyProjectTagCode
     on: master
