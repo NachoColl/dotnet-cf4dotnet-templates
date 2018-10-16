@@ -7,7 +7,7 @@ branches:
   except:
     # this is required to avoid building tags.
     - /^v?\d+\.\d+\.\d+(\w*\W*)*$/
-    # dev brach should not be published on the cloud.
+    # dev brach should not be published.
     - dev
 install:
   # install awscli for deploying
@@ -21,16 +21,15 @@ script:
   # unit testing
   - dotnet test $TRAVIS_BUILD_DIR/test
 deploy:
-  # .deploy.sh <environment> <csproj-file-name> <assembly-file-name> <project-tag-code>
   - provider: script
     skip_cleanup: true
-    script: bash $TRAVIS_BUILD_DIR/.deploy.sh test MyProject MyProjectAssemblyName MyProjectTagCode
+    script: bash $TRAVIS_BUILD_DIR/.deploy.sh test
     on: test
   - provider: script
     skip_cleanup: true
-    script: bash $TRAVIS_BUILD_DIR/.deploy.sh staging MyProject MyProjectAssemblyName MyProjectTagCode
+    script: bash $TRAVIS_BUILD_DIR/.deploy.sh staging 
     on: staging
   - provider: script
     skip_cleanup: true
-    script: bash $TRAVIS_BUILD_DIR/.deploy.sh prod MyProject MyProjectAssemblyName MyProjectTagCode
+    script: bash $TRAVIS_BUILD_DIR/.deploy.sh prod 
     on: master
