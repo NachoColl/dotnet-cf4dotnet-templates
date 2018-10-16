@@ -8,14 +8,15 @@ Some demo templates to build AWS Api Gateway and Lambdas dotNET core projects th
 dotnet new -i NachoColl.Cloudformation4dotNET.Templates
 ```
 
-To create a new ```cf4dotnet```project, just type:
-
-```bash
-dotnet new cf4dotnet
-```
-
 ## Available Templates
 
-| Name | Description |
-|------| ----------- |
-| cf4dotnet | API Gateway and Lambdas demo project. |
+### cf4dotnet
+
+A simple demo project to build your dotNET API Gateway and Lambdas.
+
+```bash
+dotnet new cf4dotnet -n MyDemoProject -as DemoAssembly -t AWSTagExample
+```
+
+![cf4dotnet-image](./assets/images/cf4dotnet_files.JPG)
+
