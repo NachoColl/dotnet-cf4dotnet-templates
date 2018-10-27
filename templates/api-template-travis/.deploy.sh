@@ -94,7 +94,9 @@ echo "Building AWS Cloudformation templates ####################################
 
 # cloudformation injection project
 CF4DOTNET_SOURCE_DLL=$(echo $ARTIFACT_PATH/$ASSEMBLY_FILENAME.dll)
-$TRAVIS_BUILD_DIR/tools/dotnet-cf4dotnet api $CF4DOTNET_SOURCE_DLL -b $TRAVIS_BUILD_NUMBER -e $ENVIRONMENT
+CF_FUNCTIONS_PREFIX=$(echo $TAG_CODE | sed 's/[^a-zA-Z0-9]/-/g')
+
+$TRAVIS_BUILD_DIR/tools/dotnet-cf4dotnet api $CF4DOTNET_SOURCE_DLL -b $TRAVIS_BUILD_NUMBER -e $ENVIRONMENT -p $CF_FUNCTIONS_PREFIX
 
 # $TRAVIS_BUILD_DIR/sam-base.yml and $TRAVIS_BUILD_DIR/sam-$ENVIRONMENT.yml created.
 ######################################################################################################
@@ -106,8 +108,8 @@ echo "deploying templates to AWS ###############################################
 CF_BASE_TEMPLATE=$(echo $TRAVIS_BUILD_DIR/sam-base.yml)
 CF_ENVIRONMENT_TEMPLATE=$(echo $TRAVIS_BUILD_DIR/sam-$ENVIRONMENT.yml)
 
-CF_BASE_STACKNAME=$(echo $TAG_CODE-base)
-CF_ENVIRONMENT_STACKNAME=$(echo $TAG_CODE-$ENVIRONMENT)
+CF_BASE_STACKNAME=$(echo $TAG_CODE-base | sed 's/[^a-zA-Z0-9]/-/g')
+CF_ENVIRONMENT_STACKNAME=$(echo $TAG_CODE-$ENVIRONMENT | sed 's/[^a-zA-Z0-9]/-/g')
 
 # deploy base template
 #echo "deploying base template ..."

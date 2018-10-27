@@ -58,6 +58,12 @@ Resources:
             - lambda.amazonaws.com
           Action:
           - sts:AssumeRole
+        - Effect: Allow
+          Principal:
+            Service:
+            - apigateway.amazonaws.com
+          Action:
+          - lambda:InvokeFunction
       Path: "/"
       Policies:
       - PolicyName: root

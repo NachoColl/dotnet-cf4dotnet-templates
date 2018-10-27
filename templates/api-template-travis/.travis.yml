@@ -13,7 +13,7 @@ install:
   # install awscli for deploying
   - pip install awscli --upgrade --user
   # install Cloudformation4dotNET tool
-  - dotnet tool install NachoColl.Cloudformation4dotNET --version 0.0.33 --tool-path $TRAVIS_BUILD_DIR/tools
+  - dotnet tool install NachoColl.Cloudformation4dotNET --version 0.0.* --tool-path $TRAVIS_BUILD_DIR/tools
 script:
   # unit testing
   - dotnet test $TRAVIS_BUILD_DIR/test
