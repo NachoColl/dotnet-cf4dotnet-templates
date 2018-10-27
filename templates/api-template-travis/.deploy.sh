@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #############################################################################
-# The ENVIRONMENT VARIABLES you must set on TRAVIS:                         #    
+# TRAVIS environment variables:                                             #
 #   AWS_ACCOUNT_test                                                        #
 #   AWS_ACCOUNT_staging                                                     #
 #   AWS_ACCOUNT_prod                                                        #
@@ -13,18 +13,18 @@
 
 set -e
 
-#################
-# ARGUMENTS     #
-#################
+#############################################################################
+# BASH arguments                                                            #
+#############################################################################
 
 # test, staging or prod
-ENVIRONMENT=${1:-prod}
+ENVIRONMENT=${1:-test}
 # the csproj file name
 CSPROJ_FILENAME=${2:-MyProject}
 # assembly filename as mentioned at the .csproj
-ASSEMBLY_FILENAME=${3:-nway.map.component.login.api}
+ASSEMBLY_FILENAME=${3:-MyProjectAssemblyName}
 # a tag used to identify resources on AWS
-TAG_CODE=${4:-nway.map.component.login.api}
+TAG_CODE=${4:-MyProjectTagCode}
 
 
 # STEP 1
@@ -112,12 +112,12 @@ CF_BASE_STACKNAME=$(echo $TAG_CODE-base | sed 's/[^a-zA-Z0-9]/-/g')
 CF_ENVIRONMENT_STACKNAME=$(echo $TAG_CODE-$ENVIRONMENT | sed 's/[^a-zA-Z0-9]/-/g')
 
 # deploy base template
-#echo "deploying base template ..."
-aws cloudformation deploy --profile deploy --template-file $CF_BASE_TEMPLATE --stack-name $CF_BASE_STACKNAME --parameter-overrides ArtifactS3Bucket=$ARTIFACT_S3_BUCKET  ArtifactS3BucketKey=$ARTIFACT_S3_KEY --tags appcode=$TAG_CODE --no-fail-on-empty-changeset 
+echo "deploying base template ..."
+aws cloudformation deploy --profile deploy --template-file $CF_BASE_TEMPLATE --stack-name $CF_BASE_STACKNAME --parameter-overrides ArtifactS3Bucket=$ARTIFACT_S3_BUCKET  ArtifactS3BucketKey=$ARTIFACT_S3_KEY --tags appcode=$TAG_CODE --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 
 # deploy environment template
-#echo "deploying $ENVIRONMENT template ..."
-aws cloudformation deploy --profile deploy --template-file $CF_ENVIRONMENT_TEMPLATE --stack-name $CF_ENVIRONMENT_STACKNAME --tags appcode=$TAG_CODE --no-fail-on-empty-changeset 
+echo "deploying $ENVIRONMENT template ..."
+aws cloudformation deploy --profile deploy --template-file $CF_ENVIRONMENT_TEMPLATE --stack-name $CF_ENVIRONMENT_STACKNAME --tags appcode=$TAG_CODE --no-fail-on-empty-changeset --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM
 
 # results: your code is on AWS!
 ############################################################################
