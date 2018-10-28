@@ -15,3 +15,4 @@ namespace MyAPI {
         public void Echo(Object Input, ILambdaContext Context) => Context?.Logger?.Log(JsonConvert.SerializeObject(Input));
     }
 }
+
